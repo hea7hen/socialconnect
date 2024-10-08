@@ -82,7 +82,7 @@ function Register() {
                 <form onSubmit={(e)=>handleSubmit(e)}>
                     <div className='brand'>
                         <img src="" alt=""/>
-                        <h1>Chat</h1>
+                        <h1>SocialConnect</h1>
                     </div>
                     <input
                         type="text"

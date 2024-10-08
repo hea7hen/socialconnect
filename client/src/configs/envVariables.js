@@ -2,7 +2,7 @@ const Reset = '\x1b[0m';
 const FgYellow = '\x1b[33m';
 
 const APP_ENV = 'prod'
-let APP_HOST = ''
+let APP_HOST = 'local'
 
 switch (APP_ENV) {
     case 'local':

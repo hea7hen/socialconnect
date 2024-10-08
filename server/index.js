@@ -28,7 +28,7 @@ mongoose.connect(process.env.MONGO_URL, {
   
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
-app.use("/api/cloud", cloudRoutes);
+// app.use("/api/cloud", cloudRoutes);
 
 const PORT = process.env.PORT || 5000
 const server = app.listen(PORT,()=>{
@@ -67,3 +67,17 @@ io.on("connection", (socket)=>{
   })
 
 })
+
+async function resetDatabase() {
+  try {
+    await User.deleteMany({});
+    await Message.deleteMany({});
+    console.log('Database reset successful');
+  } catch (error) {
+    console.error('Error resetting database:', error);
+  } finally {
+    mongoose.disconnect();
+  }
+}
+
+resetDatabase();
