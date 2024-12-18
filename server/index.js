@@ -1,83 +1,74 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const authRoutes = require("./routes/auth");
-const messageRoutes = require("./routes/messages");
-const cloudRoutes = require("./routes/cloudinary");
-const socket = require("socket.io");
-const Multer = require("multer");
-const http = require('http');
-    
-const httpServer = http.createServer()
-const app = express();
+const User = require('./models/userModel');
+const Message = require('./models/messageModel');
 require("dotenv").config();
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("DB Connetion Successfull");
-  })
-  .catch((err) => {
-    console.log(err.message);
-  });
-  
-app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
-// app.use("/api/cloud", cloudRoutes);
-
-const PORT = process.env.PORT || 5000
-const server = app.listen(PORT,()=>{
-    console.log(`Server running on Port ${PORT}`);
-})
-
-const io = socket(server,{
-  cors :{
-    origin : '*',
-    credentials : true
-  }
-})
-
-global.onlineUsers = new Map();
-
-io.on("connection", (socket)=>{
-  console.log('connect to socket', socket.id);
-  global.chatSocket = socket;
-
-  socket.on("add-user", (userId)=>{
-    onlineUsers.set(userId, socket.id);
-  })
-
-  socket.on("send-msg", (data)=>{
-    const sendUnderSocket = onlineUsers.get(data.to);
-    if(sendUnderSocket){
-      socket.to(sendUnderSocket).emit("msg-recieve", data.message)
-    }
-  })
-
-  socket.on("send-notification", (data)=>{
-    const sendUnderSocket = onlineUsers.get(data.to);
-    if(sendUnderSocket){
-      socket.to(sendUnderSocket).emit("notification-recieve",data.message)
-    }
-  })
-
-})
-
-async function resetDatabase() {
+async function resetAndVerifyDatabase() {
   try {
+    console.log("Connecting to MongoDB...");
+    await mongoose.connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("DB Connection Successful");
+    
+    // Delete all existing data
     await User.deleteMany({});
     await Message.deleteMany({});
-    console.log('Database reset successful');
+    
+    // Verify no users exist
+    const userCount = await User.countDocuments();
+    const messageCount = await Message.countDocuments();
+    
+    if (userCount === 0 && messageCount === 0) {
+      console.log('Database is clean - no users or messages exist');
+      return true;
+    } else {
+      console.error(`Database not clean! Found ${userCount} users and ${messageCount} messages`);
+      return false;
+    }
   } catch (error) {
-    console.error('Error resetting database:', error);
-  } finally {
-    mongoose.disconnect();
+    console.error('Database reset error:', error);
+    return false;
   }
 }
 
-resetDatabase();
+// Only start server if database is clean
+resetAndVerifyDatabase().then((isDatabaseClean) => {
+  if (!isDatabaseClean) {
+    console.error('Shutting down - database not clean');
+    process.exit(1);
+  }
+  
+  // Continue with server setup
+  const authRoutes = require("./routes/auth");
+  const messageRoutes = require("./routes/messages");
+  
+  app.use("/api/auth", authRoutes);
+  app.use("/api/messages", messageRoutes);
+  
+  const server = app.listen(5000, () => {
+    console.log("Server started on port 5000");
+  });
+  
+  // Socket.io setup
+  const io = require("socket.io")(server, {
+    cors: {
+      origin: "*",
+    },
+  });
+  
+  global.onlineUsers = new Map();
+  io.on("connection", (socket) => {
+    global.chatSocket = socket;
+    socket.on("add-user", (userId) => {
+      onlineUsers.set(userId, socket.id);
+    });
+  });
+});
