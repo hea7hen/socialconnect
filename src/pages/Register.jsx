@@ -129,11 +129,12 @@ const FormContainer = styled.div`
   align-items: center;
   background: linear-gradient(
     to bottom,
-    #128c7e 0%,
-    #128c7e 20%,
-    #DCDCDC 20%,
-    #DCDCDC 100%
+    var(--primary-color) 0%,
+    var(--primary-color) 20%,
+    var(--light-bg) 20%,
+    var(--light-bg) 100%
   );
+
   .brand {
     display: flex;
     align-items: center;
@@ -143,7 +144,7 @@ const FormContainer = styled.div`
       height: 5rem;
     }
     h1 {
-      color: grey;
+      color: var(--text-primary);
       text-transform: uppercase;
     }
   }
@@ -152,24 +153,30 @@ const FormContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    background-color: #ece5dd;
-    padding: 3rem 5rem;
-  }
-  input {
     background-color: white;
+    padding: 3rem 5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.2);
+  }
+
+  input {
+    background-color: var(--light-bg);
     padding: 1rem;
-    border: 0.1rem solid white;
+    border: 0.1rem solid transparent;
     border-radius: 0.4rem;
-    color: grey;
+    color: var(--text-primary);
     width: 100%;
     font-size: 1rem;
+    transition: border-color 0.3s ease;
+    
     &:focus {
-      border: 0.1rem solid #25d366;
+      border: 0.1rem solid var(--primary-color);
       outline: none;
     }
   }
+
   button {
-    background-color: #128c7e;
+    background-color: var(--primary-color);
     color: white;
     padding: 1rem 2rem;
     border: none;
@@ -178,18 +185,24 @@ const FormContainer = styled.div`
     border-radius: 0.4rem;
     font-size: 1rem;
     text-transform: uppercase;
+    transition: background-color 0.3s ease;
+    
     &:hover {
-      background-color: #075e54;
+      background-color: var(--accent-color);
     }
   }
+
   span {
-    color: grey;
+    color: var(--text-secondary);
     text-transform: uppercase;
     a {
-      color: #128c7e;
+      color: var(--primary-color);
       text-decoration: none;
       font-weight: bold;
+      &:hover {
+        color: var(--accent-color);
+      }
     }
   }
-`
+`;
 export default Register
