@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const Message = require("../models/messageModel");
 
 module.exports.login = async (req, res, next) => {
   try {
@@ -78,5 +79,21 @@ module.exports.logOut = (req, res, next) => {
     return res.status(200).send();
   } catch (error) {
     next(error);
+  }
+};
+
+module.exports.deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    // Delete user's messages
+    await Message.deleteMany({ 
+      $or: [{ sender: userId }, { receiver: userId }] 
+    });
+    // Delete user
+    await User.findByIdAndDelete(userId);
+    
+    return res.json({ status: true, message: "Account deleted successfully" });
+  } catch (err) {
+    return res.json({ status: false, msg: "Error deleting account" });
   }
 };

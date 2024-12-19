@@ -1,20 +1,20 @@
-import React,{useState,useEffect} from 'react'
+import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import { useNavigate, Link } from 'react-router-dom';
-import {ToastContainer, toast} from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { loginRoute } from '../utils/APIroute';
 
 import "react-toastify/dist/ReactToastify.css";
 
-import styled from "styled-components"
+import styled from "styled-components";
 
 function Login() {
     const navigate = useNavigate();
 
     const [values, setValues] = useState({
-        username : "",
-        password : "",
-    })
+        username: "",
+        password: "",
+    });
 
     const toastOptions = {
         position: "bottom-right",
@@ -24,55 +24,54 @@ function Login() {
         theme: "dark",
     };
 
-    useEffect(()=>{
-      if(localStorage.getItem('chat-app-user')){
-        navigate("/");
-      }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[]);
-    
+    useEffect(() => {
+        if (localStorage.getItem('chat-app-user')) {
+            navigate("/");
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const handleValidation = () => {
-      const { username, password } = values;
-      if (username === "") {
-        toast.error("Email and Password is required.", toastOptions);
-        return false;
-      } else if (password === "") {
-        toast.error("Email and Password is required.", toastOptions);
-        return false;
-      }
-      return true;
+        const { username, password } = values;
+        if (username === "") {
+            toast.error("Email and Password is required.", toastOptions);
+            return false;
+        } else if (password === "") {
+            toast.error("Email and Password is required.", toastOptions);
+            return false;
+        }
+        return true;
     };
 
-    const handleChange = (e)=>{
-        setValues({...values, [e.target.name] : e.target.value});
-    }
+    const handleChange = (e) => {
+        setValues({ ...values, [e.target.name]: e.target.value });
+    };
 
-    const handleSubmit = async(e)=>{
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if(handleValidation()){
-          const {username, password} = values;
-          console.log(values)
-          const {data} = await axios.post(loginRoute,{
-            username,
-            password
-          });
-          console.log(data);
-          if (data.status === false) {
-            toast.error(data.msg, toastOptions);
-          }
-          else{
-            localStorage.setItem("chat-app-user",JSON.stringify(data.user));
-            navigate("/");
-          }
+        if (handleValidation()) {
+            const { username, password } = values;
+            console.log(values);
+            const { data } = await axios.post(loginRoute, {
+                username,
+                password
+            });
+            console.log(data);
+            if (data.status === false) {
+                toast.error(data.msg, toastOptions);
+            } else {
+                localStorage.setItem("chat-app-user", JSON.stringify(data.user));
+                navigate("/");
+            }
         }
-    }
+    };
 
     return (
         <>
             <FormContainer>
-                <form onSubmit={(e)=>handleSubmit(e)}>
+                <form onSubmit={(e) => handleSubmit(e)}>
                     <div className='brand'>
-                        <img src="" alt=""/>
+                        <img src={require('../assets/logo-no-background.png')} alt="Social Connect Logo" />
                         <h1>SocialConnect</h1>
                     </div>
                     <input
@@ -89,13 +88,13 @@ function Login() {
                     />
                     <button type="submit">Log In</button>
                     <span>
-                      Don't have an account ? <Link to="/register">Create One.</Link>
+                        Don't have an account ? <Link to="/register">Create One.</Link>
                     </span>
                 </form>
             </FormContainer>
-            <ToastContainer/>
+            <ToastContainer />
         </>
-    )
+    );
 }
 
 const FormContainer = styled.div`
@@ -119,7 +118,7 @@ const FormContainer = styled.div`
     gap: 1rem;
     justify-content: center;
     img {
-      height: 5rem;
+      height: 10rem;
     }
     h1 {
       color: grey;
@@ -143,7 +142,7 @@ const FormContainer = styled.div`
     width: 100%;
     font-size: 1rem;
     &:focus {
-      border: 0.1rem solid 	#25d366;
+      border: 0.1rem solid #25d366;
       outline: none;
     }
   }
@@ -170,5 +169,6 @@ const FormContainer = styled.div`
       font-weight: bold;
     }
   }
-`
-export default Login
+`;
+
+export default Login;

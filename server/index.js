@@ -53,6 +53,24 @@ resetAndVerifyDatabase().then((isDatabaseClean) => {
   app.use("/api/auth", authRoutes);
   app.use("/api/messages", messageRoutes);
   
+  // Add delete user endpoint
+  app.delete("/api/users/:userId", async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      // Delete user's messages
+      await Message.deleteMany({ $or: [{ sender: userId }, { receiver: userId }] });
+      // Delete user
+      await User.findByIdAndDelete(userId);
+      // Remove from online users if they're connected
+      if (onlineUsers.has(userId)) {
+        onlineUsers.delete(userId);
+      }
+      res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Error deleting user" });
+    }
+  });
+  
   const server = app.listen(5000, () => {
     console.log("Server started on port 5000");
   });

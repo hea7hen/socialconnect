@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Lottie from "lottie-react";
-import conversation from "../assets/animation_lnhbqvxp.json";
 import styled from "styled-components";
+import logo from "../assets/logo-no-background.png";
 
 function NoSelectedContact() {
     const [user, setUser] = useState("");
@@ -22,10 +21,10 @@ function NoSelectedContact() {
 
     return (
         <Container>
-            <Lottie animationData={conversation} loop={true}/>
-                <h1>
-                    Welcome, !
-                </h1>
+            <img src={logo} alt="Logo" />
+            <h1>
+                Welcome, !
+            </h1>
             <h3>Please select a chat to Start messaging.</h3>
         </Container>
     )
